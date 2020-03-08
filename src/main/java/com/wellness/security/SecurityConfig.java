@@ -1,5 +1,6 @@
 package com.wellness.security;
 
+import com.wellness.role.Authorizations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,8 +19,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**")
-                .authenticated(); // Use Basic authentication
+                .antMatchers("/login/admin/**").hasAuthority(Authorizations.ADMIN.toString())
+                .antMatchers("/login/trainer/**").hasAuthority(Authorizations.TRAINER.toString())
+                .antMatchers("/login/customer/**").hasAuthority(Authorizations.CUSTOMER.toString())
+                .antMatchers("/login/**")
+                .authenticated();
     }
 
     @Bean
@@ -27,8 +31,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         User.UserBuilder users = User.withDefaultPasswordEncoder();
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(users.username("user").password("password").roles("USER").build());
-        manager.createUser(users.username("admin").password("password").roles("USER", "ADMIN").build());
+        manager.createUser(users.username("customer").password("password").authorities(Authorizations.CUSTOMER.toString()).build());
+        manager.createUser(users.username("admin").password("password").authorities(Authorizations.TRAINER.toString(), Authorizations.CUSTOMER.toString(),Authorizations.ADMIN.toString()).build());
+        manager.createUser(users.username("trainer").password("password").authorities(Authorizations.TRAINER.toString()).build());
         return manager;
 
     }

@@ -31,6 +31,8 @@ test {
 
 uploadArchives {
     repositories {
-        flatDir { dirs "D:/java" }
+        flatDir { dirs "/home" }
     }
 }
+
+
